@@ -1,6 +1,12 @@
 import streamlit as st
+import os
+import logging
 from openai import OpenAI
 from utils.config import config
+
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 def check_password():
     """Check if the user has entered the correct password"""
@@ -22,7 +28,25 @@ def check_password():
 
 def init_openai_client():
     """Initialize OpenAI client with API key from config"""
-    return OpenAI(api_key=config.openai_api_key)
+    api_key = config.openai_api_key
+    
+    # Check if API key is available
+    if not api_key:
+        api_key = os.environ.get("OPENAI_API_KEY")
+        
+    if not api_key:
+        logger.error("OpenAI API key not found in config or environment variables")
+        raise ValueError("Failed to initialize OpenAI client. Check your API key.")
+    
+    try:
+        # Log the first few characters of the API key for debugging (never log the full key)
+        if api_key:
+            logger.info(f"Initializing OpenAI client with API key starting with: {api_key[:4]}...")
+        
+        return OpenAI(api_key=api_key)
+    except Exception as e:
+        logger.error(f"Error initializing OpenAI client: {str(e)}")
+        raise ValueError("Failed to initialize OpenAI client. Check your API key.")
 
 def get_assistant_instructions(mode="default"):
     """Get instructions for the OpenAI assistant based on mode"""

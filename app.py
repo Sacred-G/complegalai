@@ -1,5 +1,9 @@
 import os
 from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
+
 import streamlit as st
 import sqlite3
 from utils.database import init_database
@@ -16,9 +20,6 @@ from utils.report_processor import process_medical_reports
 
 def main():
     """Main application entry point."""
-    # Load environment variables from .env file
-    load_dotenv()
-
     # Set up page config first
     st.set_page_config(
         layout="wide",
